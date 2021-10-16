@@ -47,9 +47,11 @@ class authors:
                                             port="5432",
                                             database="library_db")
             cursor = connection.cursor()
-            selecr_query = """SELECT * from authors WHERE id = %s"""
-            item_tuple = (id,)
-            cursor.execute(selecr_query, item_tuple)
+            # selecr_query = """SELECT * from authors WHERE id = %s"""
+            selecr_query = """SELECT * from authors ORDER BY id DESC LIMIT 1"""
+            # item_tuple = (id,)
+            # cursor.execute(selecr_query, item_tuple)
+            cursor.execute(selecr_query)
             connection.commit()
             print("Result", cursor.fetchall())
             
@@ -113,6 +115,35 @@ class authors:
                 cursor.close()
                 connection.close()
 
+    def generate(self, genNum):
+        
+        if (genNum < 0):
+            print('Error with input!')
+            return 
+        try:
+            connection = psycopg2.connect(user="postgres",
+                                            password="1337",
+                                            host="127.0.0.1",
+                                            port="5432",
+                                            database="library_db")
+            cursor = connection.cursor()
+
+            generate_query = """INSERT INTO authors (fullname, country)
+                                    SELECT md5(random()::text), md5(random()::text)
+                                    FROM generate_series(1, %s)"""
+            item_tuple = genNum,
+            cursor.execute(generate_query, item_tuple)
+            connection.commit()
+            
+            count = cursor.rowcount
+            print(count, "Entity generated")
+
+        except (Exception, Error) as error:
+            print("Error with PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
 
 
 class books:
@@ -229,7 +260,36 @@ class books:
             if connection:
                 cursor.close()
                 connection.close()
+    
+    def generate(self, genNum):
         
+        if (genNum < 0):
+            print('Error with input!')
+            return 
+        try:
+            connection = psycopg2.connect(user="postgres",
+                                            password="1337",
+                                            host="127.0.0.1",
+                                            port="5432",
+                                            database="library_db")
+            cursor = connection.cursor()
+
+            generate_query = """INSERT INTO books (title, rating, author_id, abonement_id)
+                                SELECT md5(random()::text), (trunc(random()*10)::int), (floor(random()*((SELECT id FROM authors ORDER BY id DESC LIMIT 1) - (SELECT id FROM authors ORDER BY id LIMIT 1) + 1) + (SELECT id FROM authors ORDER BY id LIMIT 1))::int), (trunc(random()*(SELECT id FROM abonements ORDER BY id DESC LIMIT 1))::int)
+                                FROM generate_series(1, %s)"""
+            item_tuple = genNum,
+            cursor.execute(generate_query, item_tuple)
+            connection.commit()
+            
+            count = cursor.rowcount
+            print(count, "Entity generated")
+
+        except (Exception, Error) as error:
+            print("Error with PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
     
        
 class readers:
@@ -337,6 +397,36 @@ class readers:
             connection.commit()
             count = cursor.rowcount
             print(count, "Entity deleted")
+
+        except (Exception, Error) as error:
+            print("Error with PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+
+    def generate(self, genNum):
+        
+        if (genNum < 0):
+            print('Error with input!')
+            return 
+        try:
+            connection = psycopg2.connect(user="postgres",
+                                            password="1337",
+                                            host="127.0.0.1",
+                                            port="5432",
+                                            database="library_db")
+            cursor = connection.cursor()
+
+            generate_query = """INSERT INTO readers (username, number_of_read, abonement_id)
+                                    SELECT md5(random()::text), (trunc(random() * 100)::int), (trunc(random()*(SELECT id FROM abonements ORDER BY id DESC LIMIT 1))::int)
+                                    FROM generate_series(1, %s)"""
+            item_tuple = genNum,
+            cursor.execute(generate_query, item_tuple)
+            connection.commit()
+            
+            count = cursor.rowcount
+            print(count, "Entity generated")
 
         except (Exception, Error) as error:
             print("Error with PostgreSQL", error)
@@ -458,3 +548,32 @@ class abonements:
                 cursor.close()
                 connection.close()
 
+    def generate(self, genNum):
+        
+        if (genNum < 0):
+            print('Error with input!')
+            return 
+        try:
+            connection = psycopg2.connect(user="postgres",
+                                            password="1337",
+                                            host="127.0.0.1",
+                                            port="5432",
+                                            database="library_db")
+            cursor = connection.cursor()
+
+            generate_query = """INSERT INTO abonements (price, expiring_time)
+                                    SELECT (trunc(random()*1000)::int), (trunc(random()*300)::int)
+                                    FROM generate_series(1, %s)"""
+            item_tuple = genNum,
+            cursor.execute(generate_query, item_tuple)
+            connection.commit()
+            
+            count = cursor.rowcount
+            print(count, "Entity generated")
+
+        except (Exception, Error) as error:
+            print("Error with PostgreSQL", error)
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()

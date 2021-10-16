@@ -10,9 +10,9 @@ b = books()
 r = readers()
 ab = abonements()
 
-com = view.readCommand()
+command = view.readCommand()
 
-if (com == 'create'):
+if (command == 'create'):
 
     table = view.readTable()
 
@@ -42,7 +42,7 @@ if (com == 'create'):
     else:
         print('Table with that name does not exist')
 
-elif (com == 'read'):
+elif (command == 'read'):
 
     table = view.readTable()
 
@@ -61,7 +61,7 @@ elif (com == 'read'):
     else:
         print('Table with that name does not exist')
 
-elif (com == 'update'):
+elif (command == 'update'):
 
     table = view.readTable()
 
@@ -91,7 +91,7 @@ elif (com == 'update'):
     else:
         print('Table with that name does not exist')
 
-elif (com == 'delete'):
+elif (command == 'delete'):
     
     table = view.readTable()
 
@@ -109,6 +109,25 @@ elif (com == 'delete'):
         ab.delete(id)
     else:
         print('Table with that name does not exist')
+
+elif (command == 'generate'):
+    
+    table = view.readTable()
+
+    if (table == 'authors'):
+        genNum = view.getInt()
+        au.generate(genNum)
+    elif (table == 'books'):
+        genNum = view.getInt()
+        b.generate(genNum)
+    elif (table == 'readers'):
+        genNum = view.getInt()
+        r.generate(genNum)
+    elif (table == 'abonements'):
+        genNum = view.getInt()
+        ab.generate(genNum)
+    else:
+        print('Table with that name does not exist') 
 
 else:
     print('Incorrect command')
