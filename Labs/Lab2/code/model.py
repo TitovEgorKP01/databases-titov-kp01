@@ -1,4 +1,5 @@
 import psycopg2
+from timeit import default_timer as timer
 from psycopg2 import Error
 
 
@@ -13,7 +14,7 @@ class authors:
     def create(self, id, fullname, country):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -29,7 +30,7 @@ class authors:
             print("Entity inserted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -38,7 +39,7 @@ class authors:
     def read(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -47,16 +48,14 @@ class authors:
                                             port="5432",
                                             database="library_db")
             cursor = connection.cursor()
-            # selecr_query = """SELECT * from authors WHERE id = %s"""
-            selecr_query = """SELECT * from authors ORDER BY id DESC LIMIT 1"""
-            # item_tuple = (id,)
-            # cursor.execute(selecr_query, item_tuple)
-            cursor.execute(selecr_query)
+            select_query = """SELECT * from authors WHERE id = %s"""
+            item_tuple = (id,)
+            cursor.execute(select_query, item_tuple)
             connection.commit()
             print("Result", cursor.fetchall())
             
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -65,7 +64,7 @@ class authors:
     def update(self, id, fullname, country):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return  
         try:
             connection = psycopg2.connect(user="postgres",
@@ -85,7 +84,7 @@ class authors:
             print(count, "Entity updated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -94,7 +93,7 @@ class authors:
     def delete(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -109,7 +108,7 @@ class authors:
             print(count, "Entity deleted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -139,11 +138,45 @@ class authors:
             print(count, "Entity generated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
                 connection.close()
+
+    def searchAuthorsBooks(self, fullname, title, rating):
+        
+        sttime = timer()
+
+        try:
+            connection = psycopg2.connect(user="postgres",
+                                            password="1337",
+                                            host="127.0.0.1",
+                                            port="5432",
+                                            database="library_db")
+            cursor = connection.cursor()
+            select_query = """ SELECT fullname, title, rating  
+                               FROM authors, books
+                               WHERE rating > %s AND title LIKE %s AND fullname LIKE %s AND books.author_id = authors.id
+                               ORDER BY rating DESC"""
+            item_tuple = (rating, '%' + title + '%', '%' + fullname + '%')
+            cursor.execute(select_query, item_tuple)
+            connection.commit()
+            print("Result", cursor.fetchall())
+            
+        except (Exception, Error) as error:
+            print("Error occured in PostgreSQL: ", error)
+            error()
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+
+                endtime = timer()
+
+                print("Search operation take " + str((endtime - sttime) * 1000) + " ms")
+
+
 
 
 class books:
@@ -159,7 +192,7 @@ class books:
     def create(self, id, title, rating, author_id, abonement_id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -175,7 +208,7 @@ class books:
             print("Entity inserted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -184,7 +217,7 @@ class books:
     def read(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -193,14 +226,14 @@ class books:
                                             port="5432",
                                             database="library_db")
             cursor = connection.cursor()
-            selecr_query = """SELECT * from books WHERE id = %s"""
+            select_query = """SELECT * from books WHERE id = %s"""
             item_tuple = (id,)
-            cursor.execute(selecr_query, item_tuple)
+            cursor.execute(select_query, item_tuple)
             connection.commit()
             print("Result", cursor.fetchall())
             
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -209,7 +242,7 @@ class books:
     def update(self, id, title, rating, author_id, abonement_id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return  
         try:
             connection = psycopg2.connect(user="postgres",
@@ -231,7 +264,7 @@ class books:
             print(count, "Entity updated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -240,7 +273,7 @@ class books:
     def delete(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -255,7 +288,7 @@ class books:
             print(count, "Entity deleted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -285,7 +318,7 @@ class books:
             print(count, "Entity generated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -304,7 +337,7 @@ class readers:
     def create(self, id, username, number_of_read, abonement_id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -320,7 +353,7 @@ class readers:
             print("Entity inserted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -329,7 +362,7 @@ class readers:
     def read(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -338,14 +371,14 @@ class readers:
                                             port="5432",
                                             database="library_db")
             cursor = connection.cursor()
-            selecr_query = """SELECT * from readers WHERE id = %s"""
+            select_query = """SELECT * from readers WHERE id = %s"""
             item_tuple = (id,)
-            cursor.execute(selecr_query, item_tuple)
+            cursor.execute(select_query, item_tuple)
             connection.commit()
             print("Result", cursor.fetchall())
             
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -354,7 +387,7 @@ class readers:
     def update(self, id, username, number_of_read, abonement_id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return  
         try:
             connection = psycopg2.connect(user="postgres",
@@ -375,7 +408,7 @@ class readers:
             print(count, "Entity updated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -384,7 +417,7 @@ class readers:
     def delete(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -399,7 +432,7 @@ class readers:
             print(count, "Entity deleted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -429,14 +462,13 @@ class readers:
             print(count, "Entity generated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
                 connection.close()
 
-
-        
+     
 class abonements:
 
     def __init__(self):  
@@ -448,7 +480,7 @@ class abonements:
     def create(self, id, price, expiring_time):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -464,7 +496,7 @@ class abonements:
             print("Entity inserted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -473,7 +505,7 @@ class abonements:
     def read(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -482,14 +514,14 @@ class abonements:
                                             port="5432",
                                             database="library_db")
             cursor = connection.cursor()
-            selecr_query = """SELECT * from abonements WHERE id = %s"""
+            select_query = """SELECT * from abonements WHERE id = %s"""
             item_tuple = (id,)
-            cursor.execute(selecr_query, item_tuple)
+            cursor.execute(select_query, item_tuple)
             connection.commit()
             print("Result", cursor.fetchall())
             
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -498,7 +530,7 @@ class abonements:
     def update(self, id, price, expiring_time):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return  
         try:
             connection = psycopg2.connect(user="postgres",
@@ -518,7 +550,7 @@ class abonements:
             print(count, "Entity updated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -527,7 +559,7 @@ class abonements:
     def delete(self, id):
         
         if (id < 1):
-            print('Error with input!')
+            print('Invalid id entered')
             return 
         try:
             connection = psycopg2.connect(user="postgres",
@@ -542,7 +574,7 @@ class abonements:
             print(count, "Entity deleted")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()
@@ -572,7 +604,7 @@ class abonements:
             print(count, "Entity generated")
 
         except (Exception, Error) as error:
-            print("Error with PostgreSQL", error)
+            print("Error occured in PostgreSQL: ", error)
         finally:
             if connection:
                 cursor.close()

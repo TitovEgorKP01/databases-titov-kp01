@@ -129,5 +129,13 @@ elif (command == 'generate'):
     else:
         print('Table with that name does not exist') 
 
+elif (command == 'search'):
+    
+    rating = view.getInt()
+    title = view.getVal()
+    fullname = view.getVal()
+
+    au.searchAuthorsBooks(fullname, title, rating)
+
 else:
     print('Incorrect command')

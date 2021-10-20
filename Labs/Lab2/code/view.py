@@ -6,7 +6,7 @@ class view:
         print('======================')
 
     def readCommand():
-        com = input("Enter command (create, delete, update, random): ")
+        com = input("Enter command (create, read, update, delete, generate, search): ")
         return com
 
     def readTable():        
@@ -24,6 +24,6 @@ class view:
         try:
             int(val)
         except ValueError:
-            print(val + " is invalid")
+            print(val + " is not integer")
             return 0
         return int(val)
