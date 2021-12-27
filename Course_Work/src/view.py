@@ -1,10 +1,10 @@
 class View:
 
     def __init__(self):  
-        print('----------Welcome-----------')
+        print('# Program started #')
 
     def readCommand(self):
-        com = input("Enter a command (read, create, delete, update, random, plot, index, trigger, restore or exit): ")
+        com = input("Enter a command (create, read, update, delete, random, index, plot, restore, trigger or exit): ")
         return com
 
     def readTable(self):        
